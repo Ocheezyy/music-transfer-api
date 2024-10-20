@@ -2,7 +2,7 @@ package models
 
 type Playlist struct {
 	ID            uint     `json:"id" gorm:"primary_key"`
-	Platform      Platform `json:"platform" gorm:"type:enum('APPLE', 'SPOTIFY', 'YOUTUBE')"`
+	Platform      Platform `json:"platform"`
 	ExtPlaylistID string   `json:"extPlaylistId" gorm:"unique"`
 	SongCount     uint     `json:"songCount"`
 	UserID        uint     `json:"userId"`
