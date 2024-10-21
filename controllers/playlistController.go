@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/Ocheezyy/music-transfer-api/helpers"
@@ -13,12 +14,14 @@ func CreatePlaylist(c *gin.Context) {
 	var addPlaylistInput models.AddPlaylistInput
 
 	if err := c.ShouldBindJSON(&addPlaylistInput); err != nil {
+		log.Printf("CreatePlaylist 400: %s", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	user, ok := helpers.AssertUser(c)
 	if !ok {
+		log.Print("GetPlaylist: failed to assert user")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -35,6 +38,7 @@ func CreatePlaylist(c *gin.Context) {
 
 	newPlaylist := models.Playlist{
 		UserID:        user.ID,
+		Name:          addPlaylistInput.Name,
 		ExtPlaylistID: addPlaylistInput.ExtPlaylistID,
 		Platform:      addPlaylistInput.Platform,
 		SongCount:     addPlaylistInput.SongCount,
@@ -47,6 +51,7 @@ func CreatePlaylist(c *gin.Context) {
 func GetPlaylist(c *gin.Context) {
 	user, ok := helpers.AssertUser(c)
 	if !ok {
+		log.Print("GetPlaylist: failed to assert user")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -56,6 +57,7 @@ func CreateUser(c *gin.Context) {
 	var authInput models.AuthInput
 
 	if err := c.ShouldBindJSON(&authInput); err != nil {
+		log.Printf("CreateUser bad request: %s", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -64,12 +66,14 @@ func CreateUser(c *gin.Context) {
 	initializers.DB.Where("email=?", authInput.Email).Find(&userFound)
 
 	if userFound.ID != 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "email already used"})
+		log.Print("CreateUser error: already exists")
+		c.JSON(http.StatusConflict, gin.H{"error": "email already used"})
 		return
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(authInput.Password), bcrypt.DefaultCost)
 	if err != nil {
+		log.Printf("CreateUser failed password hash: %s", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -85,7 +89,6 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetUserProfile(c *gin.Context) {
-
 	user, _ := c.Get("currentUser")
 
 	c.JSON(http.StatusOK, gin.H{
