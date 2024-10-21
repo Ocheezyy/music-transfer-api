@@ -3,14 +3,23 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Ocheezyy/music-transfer-api/helpers"
-	"github.com/Ocheezyy/music-transfer-api/initializers"
 	"github.com/Ocheezyy/music-transfer-api/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func CreatePlaylist(c *gin.Context) {
+type PlaylistController struct {
+	DB *gorm.DB
+}
+
+func NewPlaylistController(db *gorm.DB) *PlaylistController {
+	return &PlaylistController{DB: db}
+}
+
+func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
 	var addPlaylistInput models.AddPlaylistInput
 
 	if err := c.ShouldBindJSON(&addPlaylistInput); err != nil {
@@ -27,7 +36,7 @@ func CreatePlaylist(c *gin.Context) {
 	}
 
 	var playlistFound models.Playlist
-	initializers.DB.Where(
+	pc.DB.Where(
 		"ext_playlist_id=? AND user_id=?", addPlaylistInput.ExtPlaylistID, user.ID,
 	).Find(&playlistFound)
 
@@ -44,11 +53,11 @@ func CreatePlaylist(c *gin.Context) {
 		SongCount:     addPlaylistInput.SongCount,
 	}
 
-	initializers.DB.Create(&newPlaylist)
+	pc.DB.Create(&newPlaylist)
 	c.JSON(http.StatusCreated, gin.H{"data": newPlaylist})
 }
 
-func GetPlaylist(c *gin.Context) {
+func (pc *PlaylistController) GetPlaylist(c *gin.Context) {
 	user, ok := helpers.AssertUser(c)
 	if !ok {
 		log.Print("GetPlaylist: failed to assert user")
@@ -56,10 +65,14 @@ func GetPlaylist(c *gin.Context) {
 		return
 	}
 
-	playlistId := c.Param("id")
+	playlistId, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		log.Print("GetPlaylist: id argument is not a uint")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 
 	var playlist models.Playlist
-	initializers.DB.Where(
+	pc.DB.Where(
 		"id=? AND user_id=?", playlistId, user.ID,
 	).Find(&playlist)
 

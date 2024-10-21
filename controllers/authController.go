@@ -6,14 +6,22 @@ import (
 	"os"
 	"time"
 
-	"github.com/Ocheezyy/music-transfer-api/initializers"
 	"github.com/Ocheezyy/music-transfer-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
-func Login(c *gin.Context) {
+type AuthController struct {
+	DB *gorm.DB
+}
+
+func NewAuthController(db *gorm.DB) *AuthController {
+	return &AuthController{DB: db}
+}
+
+func (ac *AuthController) Login(c *gin.Context) {
 
 	var authInput models.AuthInput
 
@@ -23,7 +31,7 @@ func Login(c *gin.Context) {
 	}
 
 	var userFound models.User
-	initializers.DB.Where("email=?", authInput.Email).Find(&userFound)
+	ac.DB.Where("email=?", authInput.Email).Find(&userFound)
 
 	if userFound.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user not found"})
@@ -52,7 +60,7 @@ func Login(c *gin.Context) {
 	})
 }
 
-func CreateUser(c *gin.Context) {
+func (ac *AuthController) CreateUser(c *gin.Context) {
 
 	var authInput models.AuthInput
 
@@ -63,7 +71,7 @@ func CreateUser(c *gin.Context) {
 	}
 
 	var userFound models.User
-	initializers.DB.Where("email=?", authInput.Email).Find(&userFound)
+	ac.DB.Where("email=?", authInput.Email).Find(&userFound)
 
 	if userFound.ID != 0 {
 		log.Print("CreateUser error: already exists")
@@ -83,12 +91,12 @@ func CreateUser(c *gin.Context) {
 		Password: string(passwordHash),
 	}
 
-	initializers.DB.Create(&user)
+	ac.DB.Create(&user)
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func GetUserProfile(c *gin.Context) {
+func (ac *AuthController) GetUserProfile(c *gin.Context) {
 	user, _ := c.Get("currentUser")
 
 	c.JSON(http.StatusOK, gin.H{

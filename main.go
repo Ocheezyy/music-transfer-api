@@ -11,17 +11,21 @@ import (
 func init() {
 	initializers.LoadEnvs()
 	initializers.ConnectDB()
-
 }
 
 func main() {
-	router := gin.Default()
+	r := gin.Default()
 
-	router.POST("/auth/signup", controllers.CreateUser)
-	router.POST("/auth/login", controllers.Login)
-	router.GET("/user/profile", middlewares.CheckAuth, controllers.GetUserProfile)
-	router.POST("/playlist", middlewares.CheckAuth, controllers.CreatePlaylist)
-	router.GET("/playlist/:id", middlewares.CheckAuth, controllers.GetPlaylist)
+	db := initializers.DB
+
+	playlistController := controllers.NewPlaylistController(db)
+	authController := controllers.NewAuthController(db)
+
+	r.POST("/auth/signup", authController.CreateUser)
+	r.POST("/auth/login", authController.Login)
+	r.GET("/user/profile", middlewares.CheckAuth, authController.GetUserProfile)
+	r.POST("/playlist", middlewares.CheckAuth, playlistController.CreatePlaylist)
+	r.GET("/playlist/:id", middlewares.CheckAuth, playlistController.GetPlaylist)
 	// router.GET("/playlists", middlewares.CheckAuth, controllers.)
-	router.Run()
+	r.Run()
 }
