@@ -18,14 +18,16 @@ func main() {
 
 	db := initializers.DB
 
+	authMiddleware := middlewares.AuthMiddleware(db)
+
 	playlistController := controllers.NewPlaylistController(db)
 	authController := controllers.NewAuthController(db)
 
 	r.POST("/auth/signup", authController.CreateUser)
 	r.POST("/auth/login", authController.Login)
-	r.GET("/user/profile", middlewares.CheckAuth, authController.GetUserProfile)
-	r.POST("/playlist", middlewares.CheckAuth, playlistController.CreatePlaylist)
-	r.GET("/playlist/:id", middlewares.CheckAuth, playlistController.GetPlaylist)
+	r.GET("/user/profile", authMiddleware, authController.GetUserProfile)
+	r.POST("/playlist", authMiddleware, playlistController.CreatePlaylist)
+	r.GET("/playlist/:id", authMiddleware, playlistController.GetPlaylist)
 	// router.GET("/playlists", middlewares.CheckAuth, controllers.)
 	r.Run()
 }
