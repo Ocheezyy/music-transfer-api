@@ -1,0 +1,49 @@
+
+###
+# @name signup
+POST {{baseUrl}}/auth/signup HTTP/1.1
+Content-Type: application/json
+Content-Length: 70
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+###
+
+# @name login
+POST {{baseUrl}}/auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 142
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+###
+
+@authToken = {{login.response.body.token}}
+# @name createPlaylist
+POST {{baseUrl}}/playlist HTTP/1.1
+Content-Type: application/json
+Content-Length: 142
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "TEST_PLAYLIST_1",
+    "extPlaylistId": "ae31c5d3-b26f-4b55-be81-ce5da74feabc",
+    "platform": "SPOTIFY",
+    "songCount": 14
+}
+
+###
+
+@authToken = {{login.response.body.token}}
+# @name getPlaylist
+GET {{baseUrl}}/playlist/1 HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+
+###
