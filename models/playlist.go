@@ -2,10 +2,11 @@ package models
 
 type Playlist struct {
 	ID            uint     `json:"id" gorm:"primary_key"`
+	Name          string   `json:"name"`
 	Platform      Platform `json:"platform"`
-	ExtPlaylistID string   `json:"extPlaylistId" gorm:"unique"`
+	ExtPlaylistID string   `json:"extPlaylistId" gorm:"uniqueIndex:idx_user_id_playlist_id"`
 	SongCount     uint     `json:"songCount"`
-	UserID        uint     `json:"userId"`
+	UserID        uint     `json:"userId" gorm:"uniqueIndex:idx_user_id_playlist_id"`
 }
 
 type Platform string

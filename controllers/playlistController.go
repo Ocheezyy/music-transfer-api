@@ -29,11 +29,10 @@ func CreatePlaylist(c *gin.Context) {
 	).Find(&playlistFound)
 
 	if playlistFound.ID != 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "playlist already exists"})
+		c.JSON(http.StatusConflict, gin.H{"error": "playlist already exists"})
 		return
 	}
 
-	// Now create the playlist
 	newPlaylist := models.Playlist{
 		UserID:        user.ID,
 		ExtPlaylistID: addPlaylistInput.ExtPlaylistID,
@@ -42,7 +41,7 @@ func CreatePlaylist(c *gin.Context) {
 	}
 
 	initializers.DB.Create(&newPlaylist)
-	c.JSON(http.StatusOK, gin.H{"data": newPlaylist})
+	c.JSON(http.StatusCreated, gin.H{"data": newPlaylist})
 }
 
 func GetPlaylist(c *gin.Context) {
