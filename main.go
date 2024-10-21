@@ -21,7 +21,7 @@ func main() {
 	router.POST("/auth/login", controllers.Login)
 	router.GET("/user/profile", middlewares.CheckAuth, controllers.GetUserProfile)
 	router.POST("/playlist", middlewares.CheckAuth, controllers.CreatePlaylist)
-	router.GET("/playlist", middlewares.CheckAuth, controllers.GetPlaylist)
+	router.GET("/playlist/:id", middlewares.CheckAuth, controllers.GetPlaylist)
 	// router.GET("/playlists", middlewares.CheckAuth, controllers.)
 	router.Run()
 }
