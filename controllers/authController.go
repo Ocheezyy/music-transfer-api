@@ -35,8 +35,9 @@ func Login(c *gin.Context) {
 	}
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  userFound.ID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"id":    userFound.ID,
+		"email": userFound.Email,
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET")))
@@ -81,14 +82,13 @@ func CreateUser(c *gin.Context) {
 	initializers.DB.Create(&user)
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
-
 }
 
 func GetUserProfile(c *gin.Context) {
 
 	user, _ := c.Get("currentUser")
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"user": user,
 	})
 }
