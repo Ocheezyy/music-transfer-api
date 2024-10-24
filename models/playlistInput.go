@@ -1,6 +1,6 @@
 package models
 
-type AddPlaylistInput struct {
+type CreatePlaylistInput struct {
 	Name          string   `json:"name" binding:"required"`
 	ExtPlaylistID string   `json:"extPlaylistId" binding:"required"`
 	Platform      Platform `json:"platform" binding:"required"`

@@ -20,9 +20,9 @@ func NewPlaylistController(db *gorm.DB) *PlaylistController {
 }
 
 func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
-	var addPlaylistInput models.AddPlaylistInput
+	var createPlaylistInput models.CreatePlaylistInput
 
-	if err := c.ShouldBindJSON(&addPlaylistInput); err != nil {
+	if err := c.ShouldBindJSON(&createPlaylistInput); err != nil {
 		log.Printf("CreatePlaylist 400: %s", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -37,7 +37,7 @@ func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
 
 	var playlistFound models.Playlist
 	pc.DB.Where(
-		"ext_playlist_id=? AND user_id=?", addPlaylistInput.ExtPlaylistID, user.ID,
+		"ext_playlist_id=? AND user_id=?", createPlaylistInput.ExtPlaylistID, user.ID,
 	).Find(&playlistFound)
 
 	if playlistFound.ID != 0 {
@@ -47,10 +47,10 @@ func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
 
 	newPlaylist := models.Playlist{
 		UserID:        user.ID,
-		Name:          addPlaylistInput.Name,
-		ExtPlaylistID: addPlaylistInput.ExtPlaylistID,
-		Platform:      addPlaylistInput.Platform,
-		SongCount:     addPlaylistInput.SongCount,
+		Name:          createPlaylistInput.Name,
+		ExtPlaylistID: createPlaylistInput.ExtPlaylistID,
+		Platform:      createPlaylistInput.Platform,
+		SongCount:     createPlaylistInput.SongCount,
 	}
 
 	pc.DB.Create(&newPlaylist)

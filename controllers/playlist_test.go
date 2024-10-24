@@ -106,7 +106,7 @@ func TestCreatePlaylist_Success(t *testing.T) {
 	playlistPlatform := models.Spotify
 	playlistName := "TEST_" + gofakeit.State() + gofakeit.Color()
 
-	body := models.AddPlaylistInput{
+	body := models.CreatePlaylistInput{
 		Name:          playlistName,
 		Platform:      playlistPlatform,
 		ExtPlaylistID: extPlaylistId,
@@ -164,7 +164,7 @@ func TestCreatePlaylist_Conflict(t *testing.T) {
 	db, mock := test.NewMockDB(t)
 
 	extPlaylistId := gofakeit.UUID()
-	body := models.AddPlaylistInput{
+	body := models.CreatePlaylistInput{
 		Name:          "TEST_" + gofakeit.State() + gofakeit.Color(),
 		Platform:      models.Spotify,
 		ExtPlaylistID: extPlaylistId,

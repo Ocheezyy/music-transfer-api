@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Playlist struct {
 	ID            uint     `json:"id" gorm:"primary_key"`
 	Name          string   `json:"name"`
@@ -7,6 +9,8 @@ type Playlist struct {
 	ExtPlaylistID string   `json:"extPlaylistId" gorm:"uniqueIndex:idx_user_id_playlist_id"`
 	SongCount     uint     `json:"songCount"`
 	UserID        uint     `json:"userId" gorm:"uniqueIndex:idx_user_id_playlist_id"`
+	Songs         []Song   `json:"songs"`
+	CreatedAt     time.Time
 }
 
 type Platform string
