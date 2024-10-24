@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type TransferLog struct {
 	ID         uint       `json:"id" gorm:"primary_key"`
@@ -15,6 +17,7 @@ type TransferLog struct {
 type StatusType string
 
 const (
+	Queued     StatusType = "queued"
 	InProgress StatusType = "in_progress"
 	Completed  StatusType = "completed"
 	Failed     StatusType = "failed"

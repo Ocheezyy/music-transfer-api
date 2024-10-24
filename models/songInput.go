@@ -4,7 +4,7 @@ type CreateSongInput struct {
 	SongTitle  string `json:"songTitle" binding:"required"`
 	ArtistName string `json:"artistName" binding:"required"`
 	PlaylistID uint   `json:"playlistId" binding:"required"`
-	ISRC       string `json:"isrc" binding:"required"`
+	ISRC       string `json:"isrc"`
 }
 
 type DeleteSongInput struct {
