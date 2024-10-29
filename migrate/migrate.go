@@ -14,7 +14,13 @@ func init() {
 
 func main() {
 
-	err := initializers.DB.AutoMigrate(&models.User{}, &models.Playlist{})
+	err := initializers.DB.AutoMigrate(
+		&models.User{},
+		&models.Playlist{},
+		&models.Task{},
+		&models.Song{},
+		&models.TransferLog{},
+	)
 
 	if err != nil {
 		log.Fatalf("failed to migrate: %s", err)
