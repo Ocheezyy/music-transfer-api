@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Ocheezyy/music-transfer-api/models"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,24 @@ type SongController struct {
 
 func NewSongController(db *gorm.DB) *SongController {
 	return &SongController{DB: db}
+}
+
+func (sc *SongController) GetSong(c *gin.Context) {
+	songId, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		log.Print("GetSong: id argument is not a uint")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	var song models.Song
+	sc.DB.Where("id=?", songId).Find(&song)
+
+	if song.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "song not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": song})
 }
 
 func (sc *SongController) CreateSong(c *gin.Context) {
