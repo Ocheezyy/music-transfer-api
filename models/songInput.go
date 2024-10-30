@@ -7,6 +7,10 @@ type CreateSongInput struct {
 	ISRC       string `json:"isrc"`
 }
 
+type BulkCreateSongInput struct {
+	Songs []Song `json:"songs" binding:"required"`
+}
+
 type DeleteSongInput struct {
 	ID uint `json:"id" binding:"required"`
 }

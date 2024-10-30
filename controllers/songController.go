@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Ocheezyy/music-transfer-api/helpers"
 	"github.com/Ocheezyy/music-transfer-api/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -61,6 +62,25 @@ func (sc *SongController) CreateSong(c *gin.Context) {
 	sc.DB.Create(&newSong)
 
 	c.JSON(http.StatusCreated, gin.H{"data": newSong})
+}
+
+func (sc *SongController) BulkCreateSongs(c *gin.Context) {
+	var createSongsInput models.BulkCreateSongInput
+
+	if err := c.ShouldBindJSON(&createSongsInput); err != nil {
+		log.Printf("BulkCreateSong: %s", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	songsToInsert := createSongsInput.Songs
+
+	if err := helpers.BulkInsertSongs(sc.DB, songsToInsert); err != nil {
+		log.Fatalf("Failed to bulk insert songs %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{})
 }
 
 func (sc *SongController) DeleteSong(c *gin.Context) {
