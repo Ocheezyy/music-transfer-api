@@ -120,7 +120,14 @@ func TestCreatePlaylist_Success(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id"}).
 		AddRow(1)
 	mock.ExpectQuery(`INSERT INTO "playlists"`).
-		WithArgs(sqlmock.AnyArg(), uint(1), body.Name, body.ExtPlaylistID, body.Platform, body.SongCount).
+		WithArgs(
+			sqlmock.AnyArg(),
+			uint(1),
+			body.Name,
+			body.ExtPlaylistID,
+			body.Platform,
+			body.SongCount,
+		).
 		WillReturnRows(rows)
 
 	controller := NewPlaylistController(db)
@@ -129,7 +136,7 @@ func TestCreatePlaylist_Success(t *testing.T) {
 	c.Set("currentUser", models.User{ID: 1})
 
 	jsonBody, _ := json.Marshal(body)
-	req, _ := http.NewRequest("POST", "/playlists", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest("POST", "/playlist", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
 
 	c.Request = req
@@ -188,9 +195,9 @@ func TestCreatePlaylist_Conflict(t *testing.T) {
 	c, res := getTestContext()
 	c.Set("currentUser", models.User{ID: 1})
 
-	req, err := http.NewRequest("POST", "/playlists", bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest("POST", "/playlist", bytes.NewBuffer(jsonBody))
 	if err != nil {
-		t.Logf("TestCreatePlaylist_Conflict: Failed to create http request for /playlists, %s", err)
+		t.Logf("TestCreatePlaylist_Conflict: Failed to create http request for /playlist, %s", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
