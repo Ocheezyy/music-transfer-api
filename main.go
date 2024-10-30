@@ -23,6 +23,7 @@ func main() {
 	playlistController := controllers.NewPlaylistController(db)
 	authController := controllers.NewAuthController(db)
 	songController := controllers.NewSongController(db)
+	transferLogController := controllers.NewTransferLogController(db)
 
 	r.POST("/auth/signup", authController.CreateUser)
 	r.POST("/auth/login", authController.Login)
@@ -35,6 +36,10 @@ func main() {
 	r.POST("/song", authMiddleware, songController.CreateSong)
 	r.POST("/songs", authMiddleware, songController.BulkCreateSongs)
 	r.DELETE("/song", authMiddleware, songController.DeleteSong)
+
+	r.GET("/transferLog/:id", authMiddleware, transferLogController.GetTransferLog)
+	r.POST("/transferLog", authMiddleware, transferLogController.CreateTransferLog)
+	r.PATCH("/transferLog", authMiddleware, transferLogController.UpdateTransferLog)
 
 	// router.GET("/playlists", middlewares.CheckAuth, controllers.)
 	r.Run()
