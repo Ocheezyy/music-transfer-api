@@ -24,6 +24,7 @@ func main() {
 	authController := controllers.NewAuthController(db)
 	songController := controllers.NewSongController(db)
 	transferLogController := controllers.NewTransferLogController(db)
+	taskController := controllers.NewTaskController(db)
 
 	r.POST("/auth/signup", authController.CreateUser)
 	r.POST("/auth/login", authController.Login)
@@ -40,6 +41,10 @@ func main() {
 	r.GET("/transferLog/:id", authMiddleware, transferLogController.GetTransferLog)
 	r.POST("/transferLog", authMiddleware, transferLogController.CreateTransferLog)
 	r.PATCH("/transferLog", authMiddleware, transferLogController.UpdateTransferLog)
+
+	r.GET("/task/:id", authMiddleware, taskController.GetTask)
+	r.POST("/task", authMiddleware, taskController.CreateTask)
+	r.PATCH("/task", authMiddleware, taskController.UpdateTask)
 
 	// router.GET("/playlists", middlewares.CheckAuth, controllers.)
 	r.Run()

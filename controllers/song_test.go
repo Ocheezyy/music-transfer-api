@@ -124,7 +124,6 @@ func TestCreateSong_Success(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 
 	c.Request = req
-
 	controller.CreateSong(c)
 
 	var songRes songResponse
