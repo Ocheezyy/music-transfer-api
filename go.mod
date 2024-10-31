@@ -15,6 +15,8 @@ require (
 	gorm.io/gorm v1.25.12
 )
 
+require github.com/streadway/amqp v1.1.0
+
 require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/bytedance/sonic v1.12.3 // indirect
