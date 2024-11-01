@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -20,10 +19,13 @@ func NewSongController(db *gorm.DB) *SongController {
 }
 
 func (sc *SongController) GetSong(c *gin.Context) {
+	logMethod := "GetSong"
+
 	songId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		log.Print("GetSong: id argument is not a uint")
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 	}
 
 	var song models.Song
@@ -38,11 +40,14 @@ func (sc *SongController) GetSong(c *gin.Context) {
 }
 
 func (sc *SongController) CreateSong(c *gin.Context) {
+	logMethod := "CreateSong"
+
 	var createSongInput models.CreateSongInput
 
 	if err := c.ShouldBindJSON(&createSongInput); err != nil {
-		log.Printf("CreateSong 400: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 
@@ -50,6 +55,7 @@ func (sc *SongController) CreateSong(c *gin.Context) {
 	sc.DB.Where("id=?", createSongInput.PlaylistID).Find(&playlistFound)
 
 	if playlistFound.ID != 0 {
+		helpers.HttpLogNotFound(logMethod, "playlist not found")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "playlist not found"})
 		return
 	}
@@ -65,17 +71,20 @@ func (sc *SongController) CreateSong(c *gin.Context) {
 }
 
 func (sc *SongController) BulkCreateSongs(c *gin.Context) {
+	logMethod := "BulkCreateSongs"
+
 	var createSongsInput models.BulkCreateSongInput
 
 	if err := c.ShouldBindJSON(&createSongsInput); err != nil {
-		log.Printf("BulkCreateSong: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 	songsToInsert := createSongsInput.Songs
 
 	if err := helpers.BulkInsertSongs(sc.DB, songsToInsert); err != nil {
-		log.Fatalf("Failed to bulk insert songs %v", err)
+		helpers.HttpLogISR(logMethod, err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -84,11 +93,14 @@ func (sc *SongController) BulkCreateSongs(c *gin.Context) {
 }
 
 func (sc *SongController) DeleteSong(c *gin.Context) {
+	logMethod := "DeleteSong"
+
 	var deleteSongInput models.DeleteSongInput
 
 	if err := c.ShouldBindJSON(&deleteSongInput); err != nil {
-		log.Printf("DeleteSong 400: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 

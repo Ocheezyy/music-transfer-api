@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/Ocheezyy/music-transfer-api/helpers"
 	"github.com/Ocheezyy/music-transfer-api/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -19,10 +20,13 @@ func NewTaskController(db *gorm.DB) *TaskController {
 }
 
 func (tc *TaskController) GetTask(c *gin.Context) {
+	logMethod := "GetTask"
+
 	taskId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		log.Print("GetTask: id argument is not a uint")
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 	}
 
 	var task models.Task
@@ -37,11 +41,14 @@ func (tc *TaskController) GetTask(c *gin.Context) {
 }
 
 func (tc *TaskController) CreateTask(c *gin.Context) {
+	logMethod := "CreateTask"
+
 	var createTaskInput models.CreateTaskInput
 
 	if err := c.ShouldBindJSON(&createTaskInput); err != nil {
-		log.Printf("CreateTask 400: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 
@@ -55,10 +62,13 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 }
 
 func (tc *TaskController) UpdateTask(c *gin.Context) {
+	logMethod := "UpdateTask"
+
 	var updateTaskInput models.UpdateTaskInput
 	if err := c.ShouldBindJSON(&updateTaskInput); err != nil {
-		log.Printf("UpdateTask 400: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 
@@ -66,7 +76,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 	tc.DB.Where("id=?", updateTaskInput.ID).Find(&task)
 
 	if task.ID == 0 {
-		log.Printf("UpdateTask, id: %d not found", updateTaskInput.ID)
+		helpers.HttpLogNotFound(logMethod, fmt.Sprintf("task %d not found", updateTaskInput.ID))
 		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
 		return
 	}

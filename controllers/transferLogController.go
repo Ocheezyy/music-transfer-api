@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -20,16 +19,20 @@ func NewTransferLogController(db *gorm.DB) *TransferLogController {
 }
 
 func (tc *TransferLogController) GetTransferLog(c *gin.Context) {
+	logMethod := "GetTransferLog"
+
 	transferLogId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		log.Print("GetTransferLog: id argument is not a uint")
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 	}
 
 	var transferLog models.Song
 	tc.DB.Where("id=?", transferLogId).Find(&transferLog)
 
 	if transferLog.ID == 0 {
+		helpers.HttpLogNotFound(logMethod, "transfer_log not found")
 		c.JSON(http.StatusNotFound, gin.H{"error": "transfer_log not found"})
 		return
 	}
@@ -38,17 +41,20 @@ func (tc *TransferLogController) GetTransferLog(c *gin.Context) {
 }
 
 func (tc *TransferLogController) CreateTransferLog(c *gin.Context) {
+	logMethod := "CreateTransferLog"
+
 	var createTransferLogInput models.CreateTransferLogInput
 
 	if err := c.ShouldBindBodyWithJSON(&createTransferLogInput); err != nil {
-		log.Printf("CreateTransferLog 400: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 
 	user, ok := helpers.AssertUser(c)
 	if !ok {
-		log.Printf("CreateTransferLog: Failed to assert user")
+		helpers.HttpLogISR(logMethod, "failed to assert user")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -56,7 +62,7 @@ func (tc *TransferLogController) CreateTransferLog(c *gin.Context) {
 	var playlist models.Playlist
 	tc.DB.Where("id=?", createTransferLogInput.PlaylistID).Find(&playlist)
 	if playlist.ID == 0 {
-		log.Printf("CreateTransferLog: playlist not found")
+		helpers.HttpLogNotFound(logMethod, "playlist not found")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "playlist not found"})
 		return
 	}
@@ -72,10 +78,12 @@ func (tc *TransferLogController) CreateTransferLog(c *gin.Context) {
 }
 
 func (tc *TransferLogController) UpdateTransferLog(c *gin.Context) {
+	logMethod := "UpdateTransferLog"
+
 	var updateTransferLogInput models.UpdateTransferLogInput
 
 	if err := c.ShouldBindJSON(&updateTransferLogInput); err != nil {
-		log.Printf("UpdateTransferLog: Failed to unmarshal json")
+		helpers.HttpLogBadRequest(logMethod, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -84,8 +92,8 @@ func (tc *TransferLogController) UpdateTransferLog(c *gin.Context) {
 	tc.DB.Where("id = ?", updateTransferLogInput.ID).Find(&transferLog)
 
 	if transferLog.ID == 0 {
-		log.Printf("UpdateTransferLog, id: %d not found", updateTransferLogInput.ID)
-		c.JSON(http.StatusNotFound, gin.H{"error": "transferlog not found"})
+		helpers.HttpLogNotFound(logMethod, "transfer_log not found")
+		c.JSON(http.StatusNotFound, gin.H{"error": "transferLog not found"})
 		return
 	}
 

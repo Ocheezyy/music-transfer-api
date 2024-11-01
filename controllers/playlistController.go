@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -20,17 +19,19 @@ func NewPlaylistController(db *gorm.DB) *PlaylistController {
 }
 
 func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
+	logMethod := "CreatePlaylist"
 	var createPlaylistInput models.CreatePlaylistInput
 
 	if err := c.ShouldBindJSON(&createPlaylistInput); err != nil {
-		log.Printf("CreatePlaylist 400: %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 
 	user, ok := helpers.AssertUser(c)
 	if !ok {
-		log.Print("GetPlaylist: failed to assert user")
+		helpers.HttpLogISR(logMethod, "failed to assert user")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -41,6 +42,7 @@ func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
 	).Find(&playlistFound)
 
 	if playlistFound.ID != 0 {
+		helpers.HttpLogConflict(logMethod, "playlist already exists")
 		c.JSON(http.StatusConflict, gin.H{"error": "playlist already exists"})
 		return
 	}
@@ -58,16 +60,18 @@ func (pc *PlaylistController) CreatePlaylist(c *gin.Context) {
 }
 
 func (pc *PlaylistController) GetPlaylist(c *gin.Context) {
+	logMethod := "GetPlaylist"
+
 	user, ok := helpers.AssertUser(c)
 	if !ok {
-		log.Print("GetPlaylist: failed to assert user")
+		helpers.HttpLogISR(logMethod, "failed to assert user")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	playlistId, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		log.Print("GetPlaylist: id argument is not a uint")
+		helpers.HttpLogBadRequest(logMethod, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
@@ -77,6 +81,7 @@ func (pc *PlaylistController) GetPlaylist(c *gin.Context) {
 	).Find(&playlist)
 
 	if playlist.ID == 0 {
+		helpers.HttpLogNotFound(logMethod, "playlist not found")
 		c.JSON(http.StatusNotFound, gin.H{"error": "playlist not found"})
 		return
 	}

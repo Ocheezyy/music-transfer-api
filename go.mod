@@ -15,7 +15,12 @@ require (
 	gorm.io/gorm v1.25.12
 )
 
-require github.com/streadway/amqp v1.1.0
+require (
+	github.com/rs/zerolog v1.33.0
+	github.com/streadway/amqp v1.1.0
+)
+
+require github.com/mattn/go-colorable v0.1.13 // indirect
 
 require (
 	github.com/brianvoe/gofakeit v3.18.0+incompatible

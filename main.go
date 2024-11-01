@@ -6,8 +6,8 @@ import (
 	"github.com/Ocheezyy/music-transfer-api/controllers"
 	"github.com/Ocheezyy/music-transfer-api/initializers"
 	"github.com/Ocheezyy/music-transfer-api/middlewares"
-
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 func init() {
@@ -17,6 +17,7 @@ func init() {
 }
 
 func main() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	r := gin.Default()
 
 	db := initializers.DB

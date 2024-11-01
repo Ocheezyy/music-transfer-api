@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/Ocheezyy/music-transfer-api/helpers"
 	"github.com/Ocheezyy/music-transfer-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -22,11 +22,14 @@ func NewAuthController(db *gorm.DB) *AuthController {
 }
 
 func (ac *AuthController) Login(c *gin.Context) {
+	logMethod := "Login"
 
 	var authInput models.AuthInput
 
 	if err := c.ShouldBindJSON(&authInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		helpers.HttpLogBadRequest(logMethod, errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
 
@@ -34,11 +37,13 @@ func (ac *AuthController) Login(c *gin.Context) {
 	ac.DB.Where("email=?", authInput.Email).Find(&userFound)
 
 	if userFound.ID == 0 {
+		helpers.HttpLogBadRequest(logMethod, "User not found")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user not found"})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(authInput.Password)); err != nil {
+		helpers.HttpLogBadRequest(logMethod, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid password"})
 		return
 	}
@@ -52,6 +57,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
+		helpers.HttpLogISR(logMethod, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to generate token"})
 	}
 
@@ -61,11 +67,12 @@ func (ac *AuthController) Login(c *gin.Context) {
 }
 
 func (ac *AuthController) CreateUser(c *gin.Context) {
+	logMethod := "CreateUser"
 
 	var authInput models.AuthInput
 
 	if err := c.ShouldBindJSON(&authInput); err != nil {
-		log.Printf("CreateUser bad request: %s", err)
+		helpers.HttpLogBadRequest(logMethod, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -74,14 +81,14 @@ func (ac *AuthController) CreateUser(c *gin.Context) {
 	ac.DB.Where("email=?", authInput.Email).Find(&userFound)
 
 	if userFound.ID != 0 {
-		log.Print("CreateUser error: already exists")
+		helpers.HttpLogBadRequest(logMethod, "user already exists")
 		c.JSON(http.StatusConflict, gin.H{"error": "email already used"})
 		return
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(authInput.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Printf("CreateUser failed password hash: %s", err)
+		helpers.HttpLogISR(logMethod, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
