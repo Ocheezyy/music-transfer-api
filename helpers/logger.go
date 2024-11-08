@@ -14,6 +14,12 @@ func CoreLogError(method string, message string, isFatal bool) {
 	}
 }
 
+func CoreLogInfo(method string, message string) {
+	log.Info().
+		Str("method", method).
+		Msg(message)
+}
+
 func HttpLogNotFound(method string, message string) {
 	httpLogError(method, "Not found", message)
 }

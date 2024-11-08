@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/Ocheezyy/music-transfer-api/controllers"
 	"github.com/Ocheezyy/music-transfer-api/initializers"
 	"github.com/Ocheezyy/music-transfer-api/middlewares"
@@ -13,7 +11,8 @@ import (
 func init() {
 	initializers.LoadEnvs()
 	initializers.ConnectDB()
-	initializers.ConnectRabbitMQ(os.Getenv("RABBIT_MQ_URL"))
+	routingKey := "music-transfer-api-routing-key"
+	initializers.ConnectMQWithRetry(routingKey)
 }
 
 func main() {
