@@ -1,10 +1,11 @@
 package test
 
 import (
-	"log"
+	"fmt"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Ocheezyy/music-transfer-api/helpers"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ import (
 func NewMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
+		helpers.CoreLogError("NewMockDB", fmt.Sprintf("failed to create sqlmock: %s", err), true)
 		t.Fatalf("failed to create sqlmock: %s", err)
 	}
 
@@ -20,7 +22,7 @@ func NewMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 		Conn: db,
 	}), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to open gorm DB: %s", err)
+		helpers.CoreLogError("NewMockDB", fmt.Sprintf("failed to open gorm DB: %s", err), true)
 	}
 
 	return gormDB, mock

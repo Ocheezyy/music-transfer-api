@@ -11,6 +11,7 @@ import (
 
 var DB *gorm.DB
 
+// Connect to database so intializers.DB is accessible
 func ConnectDB() {
 	dsn := os.Getenv("DB_URL")
 	var err error
