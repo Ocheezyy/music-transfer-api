@@ -194,7 +194,7 @@ func (c *Client) UnsafePush(data []byte) error {
 }
 
 func (c *Client) Stream(cancelCtx context.Context) error {
-	c.wg.Add(threads)
+	c.wg.Add(c.threads)
 
 	for {
 		if c.isConnected {
@@ -279,14 +279,12 @@ func (c *Client) parseEvent(msg amqp.Delivery) {
 			l.Bytes("stack", stack).Str("level", "fatal").Interface("error", err).Msg("panic recovery for rabbitMQ message")
 			msg.Nack(false, false)
 		}
-	}(ctx, evt, msg, l)
+	}(nil, evt, msg, l)
 
 	switch evt.Job {
 	case "job1":
 		// Call an actual function
-		err = func()
-	case "job1":
-		err = func()
+		err = handleJob1()
 	default:
 		msg.Reject(false)
 		return
@@ -335,4 +333,8 @@ func (c *Client) Close() error {
 
 func consumerName(i int) string {
 	return fmt.Sprintf("go-consumer-%v", i)
+}
+
+func handleJob1() error {
+	return errors.New("not initialized")
 }
