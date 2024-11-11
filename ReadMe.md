@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project is a backend API built with Go, using Gorm and Fiber, connected to a PostgreSQL database. The API features RabbitMQ integration for handling background tasks such as playlist and song transfers. The purpose of this project is to showcase an efficient architecture for processing large tasks asynchronously while maintaining robust API functionality.
+This project is a backend API built with Go, using Gorm and Gin, connected to a PostgreSQL database. The API features RabbitMQ integration for handling background tasks such as playlist and song transfers. The purpose of this project is to showcase an efficient architecture for processing large tasks asynchronously while maintaining robust API functionality.
 
 ## Features
 
