@@ -33,6 +33,7 @@ Before running this project, ensure that you have the following installed on you
 - [PostgreSQL](https://www.postgresql.org/download/)
 - [RabbitMQ](https://www.rabbitmq.com/download.html)
 - [Docker](https://www.docker.com/products/docker-desktop) (optional, for containerized setup)
+- [Make](https://www.gnu.org/software/make/manual/make.html)
 
 ### Installation
 
@@ -44,7 +45,7 @@ Before running this project, ensure that you have the following installed on you
 
 2. **Install Dependencies**
     ```bash
-    go mod tidy
+    make tidy-all
     ```
 
 3. **Set Up Environment Variables**
@@ -52,13 +53,14 @@ Before running this project, ensure that you have the following installed on you
 
 4. **Run database migrations**
     ```bash
-    go run migrate/migrate.go
+    make api-migrate
     ```
 
 5. **Run the application**
     ```bash
-    go run main.go
+    make api-run
     ```
+    NOTE: Will be adding testing docker-compose functionality soon
 
 ### Project Structure
 ```

@@ -1,5 +1,5 @@
 # Makefile
-.PHONY api-run consumer-run api-tidy consumer-tidy api-test consumer-test api-migrate api-build consumer-build
+.PHONY: api-run consumer-run api-tidy consumer-tidy api-test consumer-test api-migrate api-build consumer-build tidy-all
 
 API_DIR=api
 CONSUMER_DIR=consumer
@@ -16,7 +16,7 @@ api-tidy:
 api-test:
 	cd $(API_DIR) && go test ./controllers -v
 
-api-buid:
+api-build:
 	cd $(API_DIR) && go build -o main main.go
 
 consumer-run:
@@ -31,3 +31,5 @@ consumer-test:
 consumer-build:
 	cd $(CONSUMER_DIR) && go build -o main main.go
 
+tidy-all:
+	make api-tidy && make consumer-tidy
