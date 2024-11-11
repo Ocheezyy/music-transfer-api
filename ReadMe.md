@@ -48,17 +48,7 @@ Before running this project, ensure that you have the following installed on you
     ```
 
 3. **Set Up Environment Variables**
-    Create a .env file in the project root and configure it with the following variables:
-    ```
-    DB_URL=postgres://urlhere
-    SECRET=jwt-secret-here
-    GIN_MODE=debug
-    PORT=8080
-    AMQP_URI=amqp://guest:guest@localhost:5672/
-    EXCHANGE_NAME=rabbitmq-exchange-name
-    EXCHANGE_TYPE=direct
-    QUEUE_NAME=queue-name
-    ```
+    For each service create a `.env` file based on the `example.env` file
 
 4. **Run database migrations**
     ```bash
@@ -73,22 +63,30 @@ Before running this project, ensure that you have the following installed on you
 ### Project Structure
 ```
 .
-├── main.go                # Entry point of the application
-├── controllers/           # Request handlers for different endpoints
-├── helpers/               # Helper functions
-├── initializers/          # Initializer functions to expose singleton variables
-├── middlewares/           # Middlewares for routes
-├── models/                # Database models and types
-├── producers/             # RabbitMQ producers
-├── test/                  # Test helper functions
-├── config/                # Configuration settings
-└── README.md              # Project documentation
+├── api/
+    ├── main.go                # Entry point of the application
+    ├── controllers/           # Request handlers for different endpoints
+    ├── helpers/               # Helper functions
+    ├── initializers/          # Initializer functions to expose singleton variables
+    ├── middlewares/           # Middlewares for routes
+    ├── models/                # Database models and types
+    ├── producers/             # RabbitMQ producers
+    ├── test/                  # Test helper functions
+    ├── config/                # Configuration settings
+    └── README.md              # Project documentation
+├── consumer/
+    ├── main.go                # Entry point of the application
+    ├── initializers/          # Initializer functions to expose singleton variables
+    ├── rabbitmq/              # The rabbitmq consumer client and functions related to it
+    └── types                  # Types
+└── Makefile                   # Makefile for bash commands to ease monorepo
 ```
 
 ### Future Improvements
 - [ ] Finish adding unit tests for handlers and producer.
 - [ ] Implement rate limiting for API endpoints.
 - [ ] Enhance error handling and logging mechanisms.
+- [ ] Finish setup of rabbitmq consumer client with retries, and threading
 - [ ] Create docker-compose for ability to run the entire backend easily
 
 
