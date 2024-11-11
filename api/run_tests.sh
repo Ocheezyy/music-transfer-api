@@ -1,0 +1,1 @@
+go test ./controllers -v
